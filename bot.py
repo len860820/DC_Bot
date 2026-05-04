@@ -30,6 +30,19 @@ class MyBot(discord.Client):
         if message.author == self.user:
             return
 
+    if message.content.startswith('!help'):
+        help_message = (
+            "✨ **歡迎使用洛雪機器人！** ✨\n\n"
+            "要開始使用角色卡功能，請參考以下指令：\n\n"
+            "**1. 設定角色卡：**\n"
+            "`!setchar 【名字】：... 【身分】：... 【性格】：... 【外貌】：...`\n\n"
+            "**2. 查看目前角色卡：**\n"
+            "`!getchar`\n\n"
+            "如果有任何問題，歡迎隨時呼叫我進行角色扮演！"
+        )
+        await message.channel.send(help_message)
+        return
+
         if isinstance(message.channel, discord.DMChannel):
             # 1. 檢查是否為「更新角色卡」的指令
             if message.content.startswith("!setchar"):
