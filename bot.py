@@ -95,7 +95,7 @@ class MyBot(discord.Client):
                             "Content-Type": "application/json"
                         },
                         json={
-                            "model": "gryphe/mythomax-l2-13b",
+                            "model": "Nous-Hermes-2-Mixtral-8x7B",
                             "messages": messages,
                             "temperature": 0.8,
                             "max_tokens": 1200
