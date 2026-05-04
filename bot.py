@@ -30,23 +30,34 @@ class MyBot(discord.Client):
         if message.author == self.user:
             return
 
-    if message.content.startswith('!help'):
-        help_message = (
-            "✨ **歡迎使用洛雪機器人！** ✨\n\n"
-            "要開始使用角色卡功能，請參考以下指令：\n\n"
-            "**1. 設定角色卡：**\n"
-            "`!setchar 【名字】：... 【身分】：... 【性格】：... 【外貌】：...`\n\n"
-            "**2. 查看目前角色卡：**\n"
-            "`!getchar`\n\n"
-            "如果有任何問題，歡迎隨時呼叫我進行角色扮演！"
-        )
-        await message.channel.send(help_message)
-        return
+        # 1. 當使用者輸入 "!help" 時，跳出完整提示
+        if message.content.startswith('!help'):
+            help_message = (
+                "✨ **歡迎使用洛雪機器人！** ✨\n\n"
+                "要開始使用角色卡功能，請參考以下指令：\n\n"
+                "**1. 設定角色卡：**\n"
+                "`!setchar 【名字】：... 【身分】：... 【性格】：... 【外貌】：...`\n\n"
+                "**2. 查看目前角色卡：**\n"
+                "`!getchar`\n\n"
+                "如果有任何問題，歡迎隨時呼叫我進行角色扮演！"
+            )
+            await message.channel.send(help_message)
+            return
 
         if isinstance(message.channel, discord.DMChannel):
-            # 1. 檢查是否為「更新角色卡」的指令
+            # 初次私訊提示
+            if message.author.id not in user_characters and not message.content.startswith("!"):
+                welcome_message = (
+                    "✨ **歡迎私訊洛雪機器人！** ✨\n"
+                    "您目前使用的是**預設角色卡 (魅魔艾莉絲)**。\n\n"
+                    "若想更換角色設定，請輸入指令更改：\n"
+                    "`!setchar 【名字】：... 【身分】：... 【性格】：...`\n\n"
+                    "輸入 `!help` 可以隨時查看說明！"
+                )
+                await message.channel.send(welcome_message)
+
+            # 2. 檢查是否為「更新角色卡」的指令
             if message.content.startswith("!setchar"):
-                # 取得使用者輸入的內容（去掉 "!setchar " 這段指令）
                 new_card = message.content.replace("!setchar", "").strip()
                 
                 if new_card:
@@ -56,26 +67,23 @@ class MyBot(discord.Client):
                     await message.channel.send("❌ 請在指令後面加上角色卡內容，例如：\n`!setchar 【名字】：...【性格】：...`")
                 return
 
-            # 2. 檢查是否為「查看當前角色卡」的指令
+            # 3. 檢查是否為「查看當前角色卡」的指令
             if message.content == "!getchar":
                 char_card = user_characters.get(message.author.id, DEFAULT_CHARACTER)
                 await message.channel.send(f"📋 **目前的角色卡設定：**\n{char_card}")
                 return
 
-            # 3. 正常對話流程
+            # 4. 正常對話流程
             async with message.channel.typing():
                 try:
-                    # 讀取使用者的自訂角色卡，若沒有則使用預設值
                     current_character = user_characters.get(message.author.id, DEFAULT_CHARACTER)
 
-                    # 讀取歷史訊息
                     history = []
                     async for msg in message.channel.history(limit=15):
                         role = "assistant" if msg.author == self.user else "user"
                         history.append({"role": role, "content": msg.content})
                     history.reverse()
 
-                    # 整合系統設定與歷史訊息
                     messages = [
                         {"role": "system", "content": current_character}
                     ] + history
