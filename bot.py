@@ -95,7 +95,7 @@ class MyBot(discord.Client):
                             "Content-Type": "application/json"
                         },
                         json={
-                            "model": "Nous-Hermes-2-Mixtral-8x7B",
+                            "model": "nousresearch/nous-hermes-2-mixtral-8x7b-dpo",
                             "messages": messages,
                             "temperature": 0.8,
                             "max_tokens": 1200
